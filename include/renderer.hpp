@@ -2,20 +2,24 @@
 #define FPS_ENGINE_RENDERER_HPP
 
 #include <glad/glad.h>
-#include <cstdint>
+#include <glm/vec3.hpp>
 
+#include <array>
+
+#include "ray.hpp"
 #include "rectangle.hpp"
 #include "shader.hpp"
 
 class Renderer {
 private:
-	static uint32_t VAO;
-	static uint32_t VBO;
-	static uint32_t EBO;
+    static uint32_t VAO;
+    static uint32_t VBO;
+    static uint32_t EBO;
 
 public:
-	static void initialize();
-	static void draw(const Rectangle& rectangle, Shader& shader);
+    static void initialize();
+    static void draw(const Rectangle& rectangle, Shader& shader);
+    static void draw(const Ray& ray, Shader& shader);
 };
 
 #endif

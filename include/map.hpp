@@ -9,17 +9,17 @@
 
 class Map {
 private:
-	void load(const std::string& path);
+    void load(const std::string& path);
 
 public:
-	Map(const std::string& path) { load(path); }
-	Map(const Map&) = default;
-	Map(Map&&) = default;
-	virtual ~Map() {}
+    Map(const std::string& path) { load(path); }
+    Map(const Map&) = default;
+    Map(Map&&) = default;
+    virtual ~Map() {}
 
-	int width;
-	int height;
-	std::vector<std::string> data;
+    int width;
+    int height;
+    std::vector<std::string> data;
 };
 
 #endif

@@ -4,12 +4,12 @@
 #include <glm/vec3.hpp>
 
 struct Material {
-	glm::vec3 color;
+    glm::vec3 color;
 
-	Material(const glm::vec3& color) : color(color) {}
-	Material(const Material&) = default;
-	Material(Material&&) = default;
-	virtual ~Material() = default;
+    Material(const glm::vec3& color) : color(color) {}
+    Material(const Material&) = default;
+    Material(Material&&) = default;
+    virtual ~Material() = default;
 };
 
 #endif
