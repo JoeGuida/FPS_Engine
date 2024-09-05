@@ -12,9 +12,11 @@
 #include "camera.hpp"
 #include "color.hpp"
 #include "filesystem.hpp"
+#include "line.hpp"
 #include "map.hpp"
 #include "material.hpp"
 #include "ray.hpp"
+#include "raycast.hpp"
 #include "rectangle.hpp"
 #include "renderer.hpp"
 #include "shader.hpp"
@@ -52,6 +54,7 @@ constexpr glm::vec3 COLORS[6]{
 GLFWwindow* initialize_window();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(GLFWwindow* window);
+std::vector<Line> get_lines(const std::vector<Rectangle>& rectangles);
 std::vector<Rectangle> get_rectangles(const Map& map);
 
 int main() {
@@ -59,27 +62,29 @@ int main() {
     Renderer::initialize();
 
     // -----------------------------------------------------------------
-    Shader default_shader(
-        FileSystem::get_path("/src/shaders/default.vert"), 
-        FileSystem::get_path("/src/shaders/default.frag"));
+
+    Shader default_shader(FileSystem::get_path("/src/shaders/default.vert"), 
+                          FileSystem::get_path("/src/shaders/default.frag"));
 
     // Map
-    Map map(FileSystem::get_path("/data/maps/map.txt"));
+    Map map(FileSystem::get_path("/data/maps/map1.txt"));
     assert(map.width * map.height == map.data[0].size() * map.data.size());
     std::vector<Rectangle> rectangles = get_rectangles(map);
+    std::vector<Line> lines = get_lines(rectangles);
+    std::cout << "Rectangles: " << rectangles.size() 
+              << " Lines: " << lines.size() << std::endl;
 
     // Player
     Rectangle player(0.01f, 
                      Material(Color::Blue), 
-                     Transform(glm::vec3(0.0f, -0.3f, 0.0f)));
+                     Transform(glm::vec3(-0.3f, 0.5f, 0.0f)));
     Camera player_camera(glm::vec3(0.0f, -1.0f, 0.0f),
-                         world_up, 
-                         glm::radians(90.0f), 
+                         world_up,
+                         glm::radians(90.0f),
                          Transform(player.transform.position));
-    Ray player_direction(
-        player_camera.transform.position, 
-        player_camera.front, 
-        Color::Red);
+    Ray player_direction(player_camera.transform.position, 
+                         player_camera.front, 
+                         Material(Color::Red));
 
     Ray* player_fov = new Ray[SCREEN_WIDTH];
     float rotation_amount = player_camera.fov_radians / SCREEN_WIDTH;
@@ -92,7 +97,7 @@ int main() {
         player_fov[i].direction = glm::rotate(front, 
                                               rotation_amount * i, 
                                               glm::vec3(0.0f, 0.0f, 1.0f));
-        player_fov[i].color = Color::White;
+        player_fov[i].material.color = Color::White;
     }
 
     // -----------------------------------------------------------------
@@ -120,6 +125,11 @@ int main() {
         Renderer::draw(player_direction, default_shader);
 
         for (int i = 0; i < SCREEN_WIDTH; i++) {
+            float distance = RAY_MAX_DISTANCE;
+            for (const Line& line : lines) {
+                float d = Raycast::raycast_line(player_fov[i], line);
+                if (d < distance && d > 0.0f) { distance = d; }
+            }
             Renderer::draw(player_fov[i], default_shader);
         }
 
@@ -141,14 +151,24 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+std::vector<Line> get_lines(const std::vector<Rectangle>& rectangles) {
+    std::vector<Line> lines;
+    lines.reserve(rectangles.size() * 4);
+    for (const Rectangle& rectangle : rectangles) {
+        std::array<float, 12> v = rectangle.get_vertices();
+        lines.push_back(Line(glm::vec3(v[0], v[1], v[2]), glm::vec3(v[3], v[4], v[5])));
+        lines.push_back(Line(glm::vec3(v[3], v[4], v[5]), glm::vec3(v[9], v[10], v[11])));
+        lines.push_back(Line(glm::vec3(v[9], v[10], v[11]), glm::vec3(v[6], v[7], v[8])));
+        lines.push_back(Line(glm::vec3(v[0], v[1], v[2]), glm::vec3(v[6], v[7], v[8])));
+    }
+    return lines;
+}
+
 std::vector<Rectangle> get_rectangles(const Map& map) {
     std::vector<Rectangle> rectangles;
     for (int y = 0; y < map.data.size(); y++) {
         for (int x = 0; x < map.data[0].size(); x++) {
             int index = map.data[y][x] - '0';
-
-            if (index == 2) { index = 1; } // remove when doors are implemented
-
             float size = (X_MAX - X_MIN) / map.width;
             Material material(COLORS[index]);
             Rectangle rectangle(

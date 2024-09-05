@@ -4,10 +4,11 @@
 #include <glm/vec2.hpp>
 #include <array>
 
+#include "drawable.hpp"
 #include "material.hpp"
 #include "transform.hpp"
 
-class Rectangle {
+class Rectangle : public Drawable {
 private:
     glm::vec2 size;
     std::array<uint32_t, 6> indices;
@@ -55,6 +56,7 @@ public:
 
     std::array<uint32_t, 6> get_indices() const { return indices; }
     std::array<float, 12> get_vertices() const { return vertices; }
+    Material get_material() const override { return material; }
 
     Material material;
     Transform transform;

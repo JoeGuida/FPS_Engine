@@ -57,6 +57,6 @@ void Renderer::draw(const Ray& ray, Shader& shader) {
 
     glm::mat4 model(1.0f);
     shader.set_uniform("model", model);
-    shader.set_uniform("color", glm::vec3(ray.color));
+    shader.set_uniform("color", glm::vec3(ray.material.color));
     glDrawArrays(GL_LINES, 0, 2);
 }
