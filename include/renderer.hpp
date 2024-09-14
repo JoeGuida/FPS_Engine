@@ -6,6 +6,7 @@
 
 #include <array>
 
+#include "line.hpp"
 #include "ray.hpp"
 #include "rectangle.hpp"
 #include "shader.hpp"
@@ -18,8 +19,9 @@ private:
 
 public:
     static void initialize();
-    static void draw(const Rectangle& rectangle, Shader& shader);
+    static void draw(const Line& line, Shader& shader);
     static void draw(const Ray& ray, Shader& shader);
+    static void draw(const Rectangle& rectangle, Shader& shader);
 };
 
 #endif

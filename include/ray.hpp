@@ -6,7 +6,7 @@
 
 #include "color.hpp"
 #include "drawable.hpp"
-#include "material.hpp"6
+#include "material.hpp"
 
 const float RAY_MAX_DISTANCE = 5.0f;
 

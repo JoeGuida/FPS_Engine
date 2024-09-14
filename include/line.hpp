@@ -3,6 +3,9 @@
 
 #include <glm/vec3.hpp>
 
+#include "material.hpp"
+#include "transform.hpp"
+
 struct Line {
 	glm::vec3 start;
 	glm::vec3 end;

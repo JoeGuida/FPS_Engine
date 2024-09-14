@@ -12,7 +12,7 @@ private:
     void load(const std::string& path);
 
 public:
-    Map(const std::string& path) { load(path); }
+    Map(const std::string& path) : width(0), height(0) { load(path); }
     Map(const Map&) = default;
     Map(Map&&) = default;
     virtual ~Map() {}

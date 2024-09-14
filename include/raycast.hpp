@@ -8,7 +8,7 @@
 
 struct Raycast {
 	static float cross_2d(const glm::vec3& a, const glm::vec3& b);
-	static bool raycast_line(const Ray& ray, const Line& line);
+	static float raycast_line(const Ray& ray, const Line& line);
 };
 
 #endif
